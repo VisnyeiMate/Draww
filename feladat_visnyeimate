@@ -16,7 +16,7 @@ class Program
 
             foreach (var square in squares) 
             {
-                Console.SetCursorPosition(square.Item, square.Item2);
+                Console.SetCursorPosition(square.Item1, square.Item2);
                 Console.Write("🚌");
             }
 
@@ -29,12 +29,14 @@ class Program
                 y--;
             else if (key == ConsoleKey.LeftArrow && x > 0)
                 x--;
-			else if (key == ConsoleKey.RightArrow && x < Console.WindowWidth - 1)
+            else if (key == ConsoleKey.RightArrow && x < Console.WindowWidth - 1)
                 x++;
-			else if (key == ConsoleKey.DownArrow && y < Console.WindowHeight - 1)
+            else if (key == ConsoleKey.DownArrow && y < Console.WindowHeight - 1)
                 y++;
             else if (key == ConsoleKey.Spacebar)
                 squares.Add((x, y));
+            else if (key == ConsoleKey.Escape) // Kilépési lehetőség
+                break;
         }
     }
 }
