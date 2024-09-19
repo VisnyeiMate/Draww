@@ -35,14 +35,14 @@ class Program
                 y++;
             else if (key == ConsoleKey.Spacebar)
                 squares.Add((x, y));
-else if (key==ConsoleKey.NumPad0)
-    Console.ForegroundColor = ConsoleColor.Green;
-else if (key == ConsoleKey.NumPad1)
-    Console.ForegroundColor = ConsoleColor.White;
-else if (key == ConsoleKey.NumPad2)
-    Console.ForegroundColor = ConsoleColor.Blue;
-else if (key == ConsoleKey.NumPad3)
-    Console.ForegroundColor = ConsoleColor.Red;
+            else if (key==ConsoleKey.NumPad0)
+                Console.ForegroundColor = ConsoleColor.Green;
+            else if (key == ConsoleKey.NumPad1)
+                Console.ForegroundColor = ConsoleColor.White;
+            else if (key == ConsoleKey.NumPad2)
+                Console.ForegroundColor = ConsoleColor.Blue;
+            else if (key == ConsoleKey.NumPad3)
+                Console.ForegroundColor = ConsoleColor.Red;
             else if (key == ConsoleKey.Escape) // Kilépési lehetőség
                 break;
         }
