@@ -1,4 +1,4 @@
-namespace Drawing.cs;
+namespace Drawing;
 using System;
 using System.Collections.Generic;
 
