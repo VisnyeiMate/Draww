@@ -1,27 +1,47 @@
 namespace Drawing;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 class Program
 {
+    
+    static List<(int x, int y, ConsoleColor color, char character)> squares = new List<(int x, int y, ConsoleColor color, char character)>();
+
     static void Main()
     {
-        int x = 8, y = 8; 
-        ConsoleKey key;     
-        List<(int, int)> squares = new List<(int, int)>();    
+        int x = 8, y = 8;
+        ConsoleKey key;
+        ConsoleColor currentColor = ConsoleColor.White;  
+        char currentChar = '█';  
 
-        while (true)    
+        Console.CursorVisible = false;  
+
+        while (true)
         {
-            Console.Clear();       
+           
+            int windowWidth = Console.WindowWidth;
+            int windowHeight = Console.WindowHeight;
 
-            foreach (var square in squares) 
+            Console.Clear();
+
+           
+            foreach (var square in squares)
             {
-                Console.SetCursorPosition(square.Item1, square.Item2);
-                Console.Write("█");
+                if (square.x < windowWidth && square.y < windowHeight)
+                {
+                    Console.SetCursorPosition(square.x, square.y);
+                    Console.ForegroundColor = square.color;  
+                    Console.Write(square.character);  
+                }
             }
 
-            Console.SetCursorPosition(x, y);
-            Console.Write("█");
+            if (x >= 0 && x < windowWidth && y >= 0 && y < windowHeight)
+            {
+                Console.SetCursorPosition(x, y);
+                Console.ForegroundColor = currentColor; 
+                Console.Write(currentChar);  
+            }
 
             key = Console.ReadKey(true).Key;
 
@@ -29,22 +49,45 @@ class Program
                 y--;
             else if (key == ConsoleKey.LeftArrow && x > 0)
                 x--;
-            else if (key == ConsoleKey.RightArrow && x < Console.WindowWidth - 1)
+            else if (key == ConsoleKey.RightArrow && x < windowWidth - 1)
                 x++;
-            else if (key == ConsoleKey.DownArrow && y < Console.WindowHeight - 1)
+            else if (key == ConsoleKey.DownArrow && y < windowHeight - 1)
                 y++;
             else if (key == ConsoleKey.Spacebar)
-                squares.Add((x, y));
-            else if (key==ConsoleKey.NumPad0)
-                Console.ForegroundColor = ConsoleColor.Green;
-            else if (key == ConsoleKey.NumPad1)
-                Console.ForegroundColor = ConsoleColor.White;
-            else if (key == ConsoleKey.NumPad2)
-                Console.ForegroundColor = ConsoleColor.Blue;
-            else if (key == ConsoleKey.NumPad3)
-                Console.ForegroundColor = ConsoleColor.Red;
-            else if (key == ConsoleKey.Escape) // Kilépési lehetőség
-                break;
+                squares.Add((x, y, currentColor, currentChar));  
+            else if (key == ConsoleKey.G)
+                currentColor = ConsoleColor.Green;
+            else if (key == ConsoleKey.W)
+                currentColor = ConsoleColor.White;
+            else if (key == ConsoleKey.B)
+                currentColor = ConsoleColor.Blue;
+            else if (key == ConsoleKey.R)
+                currentColor = ConsoleColor.Red;
+            else if (key == ConsoleKey.M)
+                currentColor = ConsoleColor.Magenta;
+            else if (key == ConsoleKey.S)  
+                currentChar = SwitchChar(currentChar);  
+            else if (key == ConsoleKey.Escape)
+                break;  
+
+            
+            Console.SetCursorPosition(0, windowHeight - 1);  
+        }
+
+        Console.CursorVisible = true;  
+    }
+
+    
+    static char SwitchChar(char currentChar)
+    {
+        
+        switch (currentChar)
+        {
+            case '█': return '▒';
+            case '▒': return '░';
+            case '░': return '█';  
+            default: return '█'; 
         }
     }
 }
+
