@@ -102,11 +102,10 @@ class Program
         bool optionSelected = false;
 
         int menuWidth = 20;
-        int menuHeight = 5;
+        int menuHeight = 6; 
         int menuX = (Console.WindowWidth - menuWidth) / 2;
         int menuY = (Console.WindowHeight - menuHeight) / 2;
 
-       
         for (int y = menuY - 1; y <= menuY + menuHeight; y++)
         {
             Console.SetCursorPosition(menuX - 1, y);
@@ -132,8 +131,10 @@ class Program
             Console.SetCursorPosition(menuX, menuY + 2);
             Console.WriteLine(selectedOption == 3 ? "> Betöltés" : "  Betöltés");
             Console.SetCursorPosition(menuX, menuY + 3);
-            Console.WriteLine(selectedOption == 4 ? "> Kilépés" : "  Kilépés");
+            Console.WriteLine(selectedOption == 4 ? "> Fájl törlése" : "  Fájl törlése");
             Console.SetCursorPosition(menuX, menuY + 4);
+            Console.WriteLine(selectedOption == 5 ? "> Kilépés" : "  Kilépés");
+            Console.SetCursorPosition(menuX, menuY + 5);
             keyInfo = Console.ReadKey(true);
             key = keyInfo.Key;
 
@@ -146,7 +147,7 @@ class Program
                     }
                     break;
                 case ConsoleKey.DownArrow:
-                    if (selectedOption < 4)
+                    if (selectedOption < 5) 
                     {
                         selectedOption++;
                     }
@@ -169,8 +170,47 @@ class Program
                 LoadExistingDrawing();
                 break;
             case 4:
+                DeleteDrawing(); 
+                break;
+            case 5:
                 Environment.Exit(0);
                 break;
+        }
+    }
+
+    static void DeleteDrawing()
+    {
+        string[] drawingFiles = Directory.GetFiles(".", "*.txt");
+
+        if (drawingFiles.Length == 0)
+        {
+            Console.WriteLine("Nem található ilyen.");
+            return;
+        }
+        Console.WriteLine("Válassz egy fáljt a törléshez: ");
+
+        for (int i = 0; i < drawingFiles.Length; i++)
+        {
+            Console.WriteLine($"{i + 1}. {Path.GetFileNameWithoutExtension(drawingFiles[i])}");
+        }
+
+        Console.Write("Válassz egy rajzot:  ");
+        string input = Console.ReadLine();
+
+        string[] selectedDrawingIndices = input.Split(',');
+
+        foreach (string index in selectedDrawingIndices)
+        {
+            if (int.TryParse(index, out int selectedDrawingIndex) && selectedDrawingIndex >= 1 && selectedDrawingIndex <= drawingFiles.Length)
+            {
+                string selectedDrawingFile = drawingFiles[selectedDrawingIndex - 1];
+                File.Delete(selectedDrawingFile); 
+                Console.WriteLine($"A fájl sikeresen törölve: {selectedDrawingFile}");
+            }
+            else
+            {
+                Console.WriteLine($"Nem található vagy hibás: {index}");
+            }
         }
     }
 
@@ -218,7 +258,7 @@ class Program
             }
             else
             {
-                Console.WriteLine($"Invalid input for drawing index: {index}");
+                Console.WriteLine($"Nem található vagy hibás: {index}");
             }
         }
     }
@@ -311,7 +351,7 @@ class Program
 
     static void SaveDrawing()
     {
-        Console.Write("Enter the file name to save the drawing: ");
+        Console.Write("Írj egy file nevet a mentéshez: ");
         string fileName = Console.ReadLine();
         string filePath = fileName + ".txt";
         string[] lines = new string[25];
@@ -325,7 +365,7 @@ class Program
             lines[y] = line;
         }
         File.WriteAllLines(filePath, lines);
-        Console.WriteLine("Drawing saved successfully!");
+        Console.WriteLine("A rajz sikeresen elmentve!!");
     }
 
     static void Main(string[] args)
