@@ -1,92 +1,239 @@
-namespace Drawing;
+namespace ConsoleDrawing;
 using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+using System.IO;
 
-class Program
 {
-    
-    static List<(int x, int y, ConsoleColor color, char character)> squares = new List<(int x, int y, ConsoleColor color, char character)>();
-
-    static void Main()
+    class Program
     {
-        int x = 8, y = 8;
-        ConsoleKey key;
-        ConsoleColor currentColor = ConsoleColor.White;  
-        char currentChar = '█';  
+        static char[,] screen = new char[25, 80];
+        static ConsoleColor[,] screenColors = new ConsoleColor[25, 80];
+        static int cursorX = 0, cursorY = 0;
+        static ConsoleColor currentColor = ConsoleColor.White;
+        static string currentChar = "█";
+        static ConsoleColor cursorColor = ConsoleColor.White;
 
-        Console.CursorVisible = false;  
-
-        while (true)
+        static void InitScreen()
         {
-           
-            int windowWidth = Console.WindowWidth;
-            int windowHeight = Console.WindowHeight;
-
-            Console.Clear();
-
-           
-            foreach (var square in squares)
+            for (int y = 0; y < 25; y++)
             {
-                if (square.x < windowWidth && square.y < windowHeight)
+                for (int x = 0; x < 80; x++)
                 {
-                    Console.SetCursorPosition(square.x, square.y);
-                    Console.ForegroundColor = square.color;  
-                    Console.Write(square.character);  
+                    screen[y, x] = ' ';
+                    screenColors[y, x] = ConsoleColor.Black;
                 }
             }
-
-            if (x >= 0 && x < windowWidth && y >= 0 && y < windowHeight)
-            {
-                Console.SetCursorPosition(x, y);
-                Console.ForegroundColor = currentColor; 
-                Console.Write(currentChar);  
-            }
-
-            key = Console.ReadKey(true).Key;
-
-            if (key == ConsoleKey.UpArrow && y > 0)
-                y--;
-            else if (key == ConsoleKey.LeftArrow && x > 0)
-                x--;
-            else if (key == ConsoleKey.RightArrow && x < windowWidth - 1)
-                x++;
-            else if (key == ConsoleKey.DownArrow && y < windowHeight - 1)
-                y++;
-            else if (key == ConsoleKey.Spacebar)
-                squares.Add((x, y, currentColor, currentChar));  
-            else if (key == ConsoleKey.G)
-                currentColor = ConsoleColor.Green;
-            else if (key == ConsoleKey.W)
-                currentColor = ConsoleColor.White;
-            else if (key == ConsoleKey.B)
-                currentColor = ConsoleColor.Blue;
-            else if (key == ConsoleKey.R)
-                currentColor = ConsoleColor.Red;
-            else if (key == ConsoleKey.M)
-                currentColor = ConsoleColor.Magenta;
-            else if (key == ConsoleKey.S)  
-                currentChar = SwitchChar(currentChar);  
-            else if (key == ConsoleKey.Escape)
-                break;  
-
-            
-            Console.SetCursorPosition(0, windowHeight - 1);  
         }
 
-        Console.CursorVisible = true;  
-    }
-
-    
-    static char SwitchChar(char currentChar)
-    {
-        
-        switch (currentChar)
+        static void DrawScreen()
         {
-            case '█': return '▒';
-            case '▒': return '░';
-            case '░': return '█';  
-            default: return '█'; 
+            Console.Clear();
+            for (int y = 0; y < 25; y++)
+            {
+                Console.SetCursorPosition(0, y);
+                for (int x = 0; x < 80; x++)
+                {
+                    Console.ForegroundColor = screenColors[y, x];
+                    Console.Write(screen[y, x]);
+                }
+            }
+            Console.SetCursorPosition(cursorX, cursorY);
+            Console.BackgroundColor = cursorColor;
+            Console.Write(" ");
+            Console.ResetColor();
+            Console.SetCursorPosition(cursorX, cursorY);
+            Console.CursorVisible = true;
+        }
+
+        static void DisplaySettings()
+        {
+            Console.SetCursorPosition(0, 25);
+            Console.WriteLine("Color: " + currentColor);
+            Console.WriteLine("Cursor: " + cursorX + ", " + cursorY);
+            Console.WriteLine("Character: " + currentChar);
+            Console.WriteLine("Cursor Color: " + cursorColor);
+        }
+
+        static void Backspace()
+        {
+            if (cursorX > 0)
+            {
+                cursorX--;
+                screen[cursorY, cursorX] = ' ';
+                screenColors[cursorY, cursorX] = ConsoleColor.Black;
+                DrawScreen();
+            }
+        }
+
+        static void MoveCursor(int dx, int dy)
+        {
+            int newX = cursorX + dx;
+            int newY = cursorY + dy;
+            if (newX >= 0 && newX < 80 && newY >= 0 && newY < 25)
+            {
+                cursorX = newX;
+                cursorY = newY;
+            }
+        }
+
+        static void DrawChar(string c, ConsoleColor color)
+        {
+            for (int i = 0; i < c.Length; i++)
+            {
+                if (cursorX + i < 80)
+                {
+                    screen[cursorY, cursorX + i] = c[i];
+                    screenColors[cursorY, cursorX + i] = color;
+                }
+            }
+        }
+
+        static void SetColor(ConsoleColor color)
+        {
+            currentColor = color;
+            Console.ForegroundColor = color;
+        }
+
+        static void DisplayMenu()
+        {
+            Console.Clear();
+            Console.WriteLine("Menu:");
+            Console.WriteLine("1. Edit");
+            Console.WriteLine("2. New Drawing");
+            Console.Write("Choose an option: ");
+        }
+
+        static void LoadExistingDrawing()
+        {
+            string filePath = "existing_drawing.txt";
+            if (File.Exists(filePath))
+            {
+                string[] lines = File.ReadAllLines(filePath);
+                for (int y = 0; y < Math.Min(lines.Length, 25); y++)
+                {
+                    for (int x = 0; x < Math.Min(lines[y].Length, 80); x++)
+                    {
+                        screen[y, x] = lines[y][x];
+                        screenColors[y, x] = ConsoleColor.White; // Default color, adjust as needed
+                    }
+                }
+                DrawScreen();
+            }
+        }
+
+        static void CreateNewDrawing()
+        {
+            InitScreen();
+            DrawScreen();
+        }
+
+        static void SaveDrawing()
+        {
+            string filePath = "existing_drawing.txt";
+            string[] lines = new string[25];
+            for (int y = 0; y < 25; y++)
+            {
+                string line = "";
+                for (int x = 0; x < 80; x++)
+                {
+                    line += screen[y, x];
+                }
+                lines[y] = line;
+            }
+            File.WriteAllLines(filePath, lines);
+        }
+
+        static void Main(string[] args)
+        {
+            InitScreen();
+            while (true)
+            {
+                DisplayMenu();
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                ConsoleKey key = keyInfo.Key;
+
+                switch (key)
+                {
+                    case ConsoleKey.D2:
+                        Console.Clear();
+                        CreateNewDrawing();
+                        while (true)
+                        {
+                            DrawScreen();
+                            DisplaySettings();
+
+                            ConsoleKeyInfo originalKeyInfo = Console.ReadKey(true);
+                            ConsoleKey originalKey = originalKeyInfo.Key;
+
+                            switch (originalKey)
+                            {
+                                case ConsoleKey.Backspace:
+                                    Backspace();
+                                    break;
+                                case ConsoleKey.UpArrow:
+                                    MoveCursor(0, -1);
+                                    break;
+                                case ConsoleKey.DownArrow:
+                                    MoveCursor(0, 1);
+                                    break;
+                                case ConsoleKey.LeftArrow:
+                                    MoveCursor(-1, 0);
+                                    break;
+                                case ConsoleKey.RightArrow:
+                                    MoveCursor(1, 0);
+                                    break;
+                                case ConsoleKey.Spacebar:
+                                    DrawChar(currentChar, currentColor);
+                                    break;
+                                case ConsoleKey.D0:
+                                    SetColor(ConsoleColor.DarkBlue);
+                                    break;
+                                case ConsoleKey.D1:
+                                    SetColor(ConsoleColor.Red);
+                                    break;
+                                case ConsoleKey.D2:
+                                    SetColor(ConsoleColor.Green);
+                                    break;
+                                case ConsoleKey.D3:
+                                    SetColor(ConsoleColor.Yellow);
+                                    break;
+                                case ConsoleKey.D4:
+                                    SetColor(ConsoleColor.Blue);
+                                    break;
+                                case ConsoleKey.D5:
+                                    SetColor(ConsoleColor.Magenta);
+                                    break;
+                                case ConsoleKey.D6:
+                                    SetColor(ConsoleColor.Cyan);
+                                    break;
+                                case ConsoleKey.D7:
+                                    SetColor(ConsoleColor.DarkGreen);
+                                    break;
+                                case ConsoleKey.D8:
+                                    SetColor(ConsoleColor.DarkYellow);
+                                    break;
+                                case ConsoleKey.D9:
+                                    SetColor(ConsoleColor.DarkRed);
+                                    break;
+                                case ConsoleKey.NumPad1:
+                                    currentChar = "█";
+                                    break;
+                                case ConsoleKey.NumPad2:
+                                    currentChar = "▓";
+                                    break;
+                                case ConsoleKey.NumPad3:
+                                    currentChar = "▒";
+                                    break;
+                                case ConsoleKey.NumPad4:
+                                    currentChar = "░";
+                                    break;
+                                case ConsoleKey.Escape:
+                                    SaveDrawing();
+                                    return; // Exit the program on Escape
+                            }
+                        }
+                        break;
+                }
+            }
         }
     }
 }
