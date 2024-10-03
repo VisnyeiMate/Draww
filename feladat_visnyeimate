@@ -2,7 +2,7 @@ namespace ConsoleDrawing;
 using System;
 using System.IO;
 
-{
+
     class Program
     {
         static char[,] screen = new char[25, 80];
