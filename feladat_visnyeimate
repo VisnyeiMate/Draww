@@ -102,7 +102,7 @@ class Program
         bool optionSelected = false;
 
         int menuWidth = 20;
-        int menuHeight = 6;
+        int menuHeight = 5;
         int menuX = (Console.WindowWidth - menuWidth) / 2;
         int menuY = (Console.WindowHeight - menuHeight) / 2;
 
@@ -127,14 +127,12 @@ class Program
             Console.SetCursorPosition(menuX, menuY);
             Console.WriteLine(selectedOption == 1 ? "> Rajz szerkesztése" : "  Rajz szerkesztése");
             Console.SetCursorPosition(menuX, menuY + 1);
-            Console.WriteLine(selectedOption == 2 ? "> Mentés" : "  Mentés");
+            Console.WriteLine(selectedOption == 2 ? "> Betöltés" : "  Betöltés");
             Console.SetCursorPosition(menuX, menuY + 2);
-            Console.WriteLine(selectedOption == 3 ? "> Betöltés" : "  Betöltés");
+            Console.WriteLine(selectedOption == 3 ? "> Fájl törlése" : "  Fájl törlése");
             Console.SetCursorPosition(menuX, menuY + 3);
-            Console.WriteLine(selectedOption == 4 ? "> Fájl törlése" : "  Fájl törlése");
+            Console.WriteLine(selectedOption == 4 ? "> Kilépés" : "  Kilépés");
             Console.SetCursorPosition(menuX, menuY + 4);
-            Console.WriteLine(selectedOption == 5 ? "> Kilépés" : "  Kilépés");
-            Console.SetCursorPosition(menuX, menuY + 5);
             keyInfo = Console.ReadKey(true);
             key = keyInfo.Key;
 
@@ -147,7 +145,7 @@ class Program
                     }
                     break;
                 case ConsoleKey.DownArrow:
-                    if (selectedOption < 5)
+                    if (selectedOption < 4)
                     {
                         selectedOption++;
                     }
@@ -164,15 +162,12 @@ class Program
                 CreateNewDrawing();
                 break;
             case 2:
-                SaveDrawing();
-                break;
-            case 3:
                 LoadExistingDrawing();
                 break;
-            case 4:
+            case 3:
                 DeleteDrawing();
                 break;
-            case 5:
+            case 4:
                 Environment.Exit(0);
                 break;
         }
@@ -190,7 +185,7 @@ class Program
 
         int selectedOption = 0;
         bool optionSelected = false;
-        bool exitMenu = false; 
+        bool exitMenu = false;
 
         do
         {
@@ -222,21 +217,36 @@ class Program
                 case ConsoleKey.Enter:
                     optionSelected = true;
                     break;
-                case ConsoleKey.Escape: 
+                case ConsoleKey.Escape:
                     exitMenu = true;
                     optionSelected = true;
                     break;
             }
         } while (!optionSelected && !exitMenu);
 
-        if (exitMenu) 
+        if (exitMenu)
         {
             return;
         }
 
         string selectedDrawingFile = drawingFiles[selectedOption];
-        File.Delete(selectedDrawingFile);
-        Console.WriteLine($"A fájl sikeresen törölve: {selectedDrawingFile}");
+
+        Console.WriteLine("Biztosan törölni szeretné a fájlt? (I/N)");
+        ConsoleKeyInfo confirmKeyInfo = Console.ReadKey(true);
+        ConsoleKey confirmKey = confirmKeyInfo.Key;
+
+        if (confirmKey == ConsoleKey.I)
+        {
+            File.Delete(selectedDrawingFile);
+            Console.WriteLine($"A fájl sikeresen törölve: {selectedDrawingFile}");
+        }
+        else
+        {
+            Console.WriteLine("A fájl törlése sikertelen.");
+        }
+
+        Console.WriteLine("Nyomja meg az ESC gombot a menübe lépéshez");
+        Console.ReadKey(true);
     }
 
     static void LoadExistingDrawing()
@@ -251,7 +261,7 @@ class Program
 
         int selectedOption = 0;
         bool optionSelected = false;
-        bool exitMenu = false; 
+        bool exitMenu = false;
 
         do
         {
@@ -283,14 +293,14 @@ class Program
                 case ConsoleKey.Enter:
                     optionSelected = true;
                     break;
-                case ConsoleKey.Escape: 
+                case ConsoleKey.Escape:
                     exitMenu = true;
                     optionSelected = true;
                     break;
             }
         } while (!optionSelected && !exitMenu);
 
-        if (exitMenu) 
+        if (exitMenu)
         {
             return;
         }
