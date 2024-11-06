@@ -3,6 +3,36 @@ using System;
 using System.IO;
 using System.Linq.Expressions;
 
+using Microsoft.EntityFrameworkCore;
+
+public class Drawing
+{
+    public int Id { get; set; }
+
+    public string Name { get; set; } = string.Empty;
+
+    public string Content { get; set; } = string.Empty; 
+}
+
+public class DrawingContext : DbContext
+{
+    public DbSet<Drawing> Drawings { get; set; } = null!;
+
+    
+    public DrawingContext()
+    {
+        Database.EnsureCreated();
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        
+        optionsBuilder.UseSqlServer(
+            @"Server=(localdb)\mssqllocaldb;AttachDbFilename=C:\Users\kispr\source\repos\ConsoleApp7;Database=DrawingDB;Trusted_Connection=True;"
+        );
+    }
+}
+
 class Program
 {
     static char[,] screen = new char[25, 80];
